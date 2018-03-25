@@ -20,56 +20,54 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.visual.dto.Operation;
 import com.visual.entity.ConfigBean;
+import com.visual.enums.StateEnum;
 import com.visual.service.ExchangeService;
 import com.visual.service.abs.AbstractExChangeService;
 
-public class BaseExChangeService extends AbstractExChangeService implements ExchangeService {
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
+
+public class BaseExChangeServiceImp extends AbstractExChangeService implements ExchangeService {
 	
+	private Logger logger=LoggerFactory.getLogger(this.getClass());
 	
 	@Override
-	public void makeXml(ConfigBean config,File file) {
+	public void makeXml(ConfigBean config,File file) throws Exception{
 		// TODO Auto-generated method stub
 		DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
 		DocumentBuilder db;
-		try {
-			db = dbf.newDocumentBuilder();
-			Document document=db.newDocument();
-			document.setXmlStandalone(true);
-			
-			HashMap<String,String[]>requiredValue=config.getRequiredValue();
-			HashMap<String,String[]>optionalValue=config.getOptionalValue();
-			
-			//创建根节点
-			Element root=createRoot(document);
-			//根节点设置子节点并赋值
-			SetMustProperty(root,config,document);
-			SetRequiredProperty(root,config,document,requiredValue);
-			SetDoNotModify(root,document);
-			//设置可选条件			
-			if(config.getOptionalmap()!=null) {
-				setOptionalProperty(root,config,document,optionalValue);
-			}
-			
-			document.appendChild(root);
-			TransformerFactory tff=TransformerFactory.newInstance();
-	        Transformer tf=tff.newTransformer();
-	        tf.setOutputProperty(OutputKeys.INDENT, "yes");
-	        tf.transform(new DOMSource(document), new StreamResult(file));
-			
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
+		
+		
+		db = dbf.newDocumentBuilder();
+		Document document=db.newDocument();
+		document.setXmlStandalone(true);
+		
+		HashMap<String,String[]>requiredValue=config.getRequiredValue();
+		HashMap<String,String[]>optionalValue=config.getOptionalValue();
+		
+		//创建根节点
+		Element root=createRoot(document);
+		//根节点设置子节点并赋值
+		SetMustProperty(root,config,document);
+		SetRequiredProperty(root,config,document,requiredValue);
+		SetDoNotModify(root,document);
+		//设置可选条件			
+		if(config.getOptionalmap()!=null) {
+			setOptionalProperty(root,config,document,optionalValue);
+		}
+		
+		document.appendChild(root);
+		TransformerFactory tff=TransformerFactory.newInstance();
+        Transformer tf=tff.newTransformer();
+        tf.setOutputProperty(OutputKeys.INDENT, "yes");
+        tf.transform(new DOMSource(document), new StreamResult(file));
+		
 	}
 
 	
@@ -192,31 +190,37 @@ public class BaseExChangeService extends AbstractExChangeService implements Exch
 
 	
 	@Override
-	public void sendCommand(String command) {
+	public void sendCommand(String command) throws Exception {
 		// TODO Auto-generated method stub
-		try {
-			Process pro=Runtime.getRuntime().exec(new String[] {"java","-jar",
-					"/home/tv_qos/itoolbox/iToolBoxPlugin.jar",command,"/home/tv_qos/zz/tempFile.xml"});
-			int waitNumber=pro.waitFor();
-			if(waitNumber==0) {
-				System.out.println("success");
-			}
-			else {
-				System.out.println("failed");
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		Process pro=Runtime.getRuntime().exec(new String[] {"java","-jar",
+				"/home/tv_qos/itoolbox/iToolBoxPlugin.jar",command,"/home/tv_qos/zz/tempFile.xml"});
+		int waitNumber=pro.waitFor();
+		if(waitNumber==0) {
+			System.out.println("success");
+		}
+		else {
+			System.out.println("failed");
 		}
 	}
 
+	
+	
 	@Override
 	public boolean deleteXml() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public Operation execute(ConfigBean config,File file){
+		try{
+			
+			makeXml(config,file);
+			sendCommand(config.getCommand());
+			return new Operation(StateEnum.SUCCESS);
+		}catch(Exception e){
+			return new Operation(StateEnum.FAILED);
+		}
+		
 	}
 
 }

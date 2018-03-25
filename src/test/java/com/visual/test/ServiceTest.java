@@ -5,11 +5,11 @@ import java.util.HashMap;
 
 import com.visual.entity.ConfigBean;
 import com.visual.service.ExchangeService;
-import com.visual.service.imp.BaseExChangeService;
+import com.visual.service.imp.BaseExChangeServiceImp;
 
 public class ServiceTest {
-	public static void main(String[]args) {
-		ExchangeService es=new BaseExChangeService();
+	public static void main(String[]args) throws Exception {
+		ExchangeService es=new BaseExChangeServiceImp();
 		
 		File tempFile=new File("D:\\test\\tempFile.xml");
 		ConfigBean config=new ConfigBean();

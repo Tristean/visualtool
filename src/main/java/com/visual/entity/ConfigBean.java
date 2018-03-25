@@ -16,9 +16,17 @@ public class ConfigBean {
 	//可选条件信息	
 	private HashMap<String,String>optionalmap=new HashMap<String,String>();
 	private HashMap<String,String[]>optionalValue=new HashMap<String,String[]>();
+	//命令参数
+	private String command;
 	
 	
 	
+	public String getCommand() {
+		return command;
+	}
+	public void setCommand(String command) {
+		this.command = command;
+	}
 	public HashMap<String, String> getOptionalmap() {
 		return optionalmap;
 	}
