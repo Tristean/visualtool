@@ -1,5 +1,6 @@
 package com.visual.entity;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class ConfigBean {
@@ -72,5 +73,13 @@ public class ConfigBean {
 	public void setCc(String[] cc) {
 		this.cc = cc;
 	}
-		
+	
+	@Override
+	public String toString() {
+		return "ConfigBean [mail_subject=" + mail_subject + ", mailTo=" + Arrays.toString(mailTo) + ", cc="
+				+ Arrays.toString(cc) + ", requiredmap=" + requiredmap + ", requiredValue=" + requiredValue
+				+ ", optionalmap=" + optionalmap + ", optionalValue=" + optionalValue + ", command=" + command + "]";
+	}
+	
+	
 }
